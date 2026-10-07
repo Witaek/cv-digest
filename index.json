@@ -1,4 +1,10 @@
 {
-  "daily": [],
+  "daily": [
+    {
+      "id": "2026-10-07",
+      "title": "CV Digest \u2014 Wednesday, October 7, 2026",
+      "path": "daily/2026-10-07.md"
+    }
+  ],
   "monthly": []
 }
