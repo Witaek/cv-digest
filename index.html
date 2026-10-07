@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV Digest</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --panel: #efede6; --text: #1d1d1b; --muted: #6b6a64;
+    --line: #dcd9cf; --accent: #2f6f5e; --accent-soft: #dcebe5; --code: #e9e6dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141513; --panel: #1b1c1a; --text: #e7e5de; --muted: #9a988f;
+      --line: #2c2d2a; --accent: #7cc4ad; --accent-soft: #20332d; --code: #24251f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: grid; grid-template-columns: 280px 1fr; min-height: 100vh;
+  }
+  aside {
+    background: var(--panel); border-right: 1px solid var(--line);
+    padding: 20px 16px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand { font-weight: 700; letter-spacing: .02em; font-size: 15px; margin: 0 0 4px; }
+  .brand span { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  input[type=search] {
+    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: inherit; font-size: 14px; margin-bottom: 14px;
+  }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tabs button {
+    flex: 1; padding: 6px 0; border-radius: 8px; border: 1px solid var(--line);
+    background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .tabs button.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 600; }
+  .group { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin: 14px 4px 6px; }
+  nav a {
+    display: block; padding: 6px 10px; border-radius: 8px; color: var(--text);
+    text-decoration: none; font-size: 14px;
+  }
+  nav a:hover { background: var(--line); }
+  nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  nav .empty { color: var(--muted); font-size: 14px; padding: 6px 10px; }
+  main { padding: 40px 48px 80px; max-width: 820px; width: 100%; }
+  .meta { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+  article h1 { font-size: 28px; line-height: 1.25; margin: 0 0 20px; }
+  article h2 { font-size: 19px; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  article h3 { font-size: 16px; margin: 22px 0 6px; }
+  article a { color: var(--accent); }
+  article li { margin: 6px 0; }
+  article code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  article pre { background: var(--code); padding: 12px; border-radius: 8px; overflow-x: auto; }
+  article pre code { background: none; padding: 0; }
+  article blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent); color: var(--muted); }
+  .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .pager a { color: var(--accent); text-decoration: none; font-size: 14px; }
+  .menu { display: none; }
+  @media (max-width: 760px) {
+    body { grid-template-columns: 1fr; }
+    aside { position: fixed; inset: 0 30% 0 0; z-index: 10; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 0 40px rgba(0,0,0,.25); }
+    body.open aside { transform: none; }
+    main { padding: 64px 16px 64px; }
+    .menu {
+      display: block; position: fixed; top: 12px; left: 12px; z-index: 11;
+      padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line);
+      background: var(--panel); color: var(--text); font: inherit; font-size: 14px;
+    }
+  }
+</style>
+</head>
+<body>
+<button class="menu" id="menu">☰ Digests</button>
+<aside>
+  <p class="brand">CV <span>Digest</span></p>
+  <p class="sub">Models · research · GPU</p>
+  <input type="search" id="q" placeholder="Search titles and content…">
+  <div class="tabs">
+    <button data-s="daily" class="on">Daily</button>
+    <button data-s="monthly">Monthly</button>
+  </div>
+  <nav id="nav"></nav>
+</aside>
+<main><article id="doc"><p class="meta">Loading…</p></article><div class="pager" id="pager"></div></main>
+
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script>
+const state = { index: { daily: [], monthly: [] }, section: "daily", cache: {}, q: "" };
+const $ = (id) => document.getElementById(id);
+const monthName = (id) => {
+  const m = id.match(/^(\d{4})-(\d{2})/);
+  return m ? new Date(+m[1], +m[2] - 1, 1).toLocaleString("en", { month: "long", year: "numeric" }) : "Other";
+};
+
+async function load(entry) {
+  if (!(entry.path in state.cache)) {
+    const r = await fetch(entry.path, { cache: "no-cache" });
+    state.cache[entry.path] = r.ok ? await r.text() : "# Not found";
+  }
+  return state.cache[entry.path];
+}
+
+function renderNav() {
+  const list = state.index[state.section];
+  const q = state.q.toLowerCase();
+  const items = list.filter((e) => !q || e.title.toLowerCase().includes(q) || e.id.includes(q) ||
+    (state.cache[e.path] || "").toLowerCase().includes(q));
+  const cur = location.hash.slice(2);
+  let html = "", group = null;
+  for (const e of items) {
+    const g = state.section === "daily" ? monthName(e.id) : e.id.slice(0, 4);
+    if (g !== group) { html += `<div class="group">${g}</div>`; group = g; }
+    const label = state.section === "daily"
+      ? new Date(e.id + "T12:00").toLocaleDateString("en", { weekday: "short", day: "numeric", month: "short" })
+      : e.title;
+    html += `<a href="#/${state.section}/${e.id}" class="${cur === state.section + "/" + e.id ? "on" : ""}">${label}</a>`;
+  }
+  $("nav").innerHTML = html || `<div class="empty">${list.length ? "No matches." : "Nothing here yet."}</div>`;
+  document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.s === state.section));
+}
+
+async function route() {
+  let [section, id] = location.hash.replace(/^#\//, "").split("/");
+  if (!state.index[section]) section = "daily";
+  state.section = section;
+  const list = state.index[section];
+  const i = Math.max(0, list.findIndex((e) => e.id === id));
+  const entry = list[i];
+  renderNav();
+  document.body.classList.remove("open");
+  if (!entry) {
+    $("doc").innerHTML = `<h1>No ${section} digests yet</h1><p class="meta">They'll show up here after the next run.</p>`;
+    $("pager").innerHTML = ""; return;
+  }
+  if (!id) { history.replaceState(null, "", `#/${section}/${entry.id}`); renderNav(); }
+  const md = await load(entry);
+  $("doc").innerHTML = DOMPurify.sanitize(marked.parse(md));
+  $("doc").querySelectorAll("a[href^='http']").forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
+  const newer = list[i - 1], older = list[i + 1];
+  $("pager").innerHTML =
+    (older ? `<a href="#/${section}/${older.id}">← ${older.id}</a>` : "<span></span>") +
+    (newer ? `<a href="#/${section}/${newer.id}">${newer.id} →</a>` : "<span></span>");
+  window.scrollTo(0, 0);
+}
+
+let prefetched = false;
+$("q").addEventListener("input", async (ev) => {
+  state.q = ev.target.value;
+  if (!prefetched && state.q) { prefetched = true; await Promise.all(state.index[state.section].map(load)); }
+  renderNav();
+});
+document.querySelectorAll(".tabs button").forEach((b) =>
+  b.addEventListener("click", () => { location.hash = `#/${b.dataset.s}`; prefetched = false; }));
+$("menu").addEventListener("click", () => document.body.classList.toggle("open"));
+window.addEventListener("hashchange", route);
+
+fetch("index.json", { cache: "no-cache" }).then((r) => r.json()).then((idx) => {
+  state.index = Object.assign({ daily: [], monthly: [] }, idx); route();
+}).catch(() => { $("doc").innerHTML = "<h1>Couldn't load index.json</h1>"; });
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Serves this folder on port 8080. Run from the repo root: docker compose up -d
+# New digests appear as soon as the clone is pulled (see README for the pull job).
+services:
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
