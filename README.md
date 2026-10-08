@@ -15,6 +15,17 @@ index.html, vendor/     the web UI (static, no build step, no external requests)
 
 To add another section later, create the folder, add its name to `SECTIONS` in `scripts/build_index.py`, and add a tab in `index.html`.
 
+## Serving it with GitHub Pages
+
+The UI is plain static files, so GitHub Pages can host it with no build step.
+In the repo on GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch**,
+branch `main`, folder `/ (root)`. The site is then at `https://witaek.github.io/cv-digest/`
+and updates within a minute or two of each digest being pushed. The empty `.nojekyll` file
+makes Pages serve the Markdown files as they are, instead of running them through Jekyll.
+
+Note: for a private repo, Pages needs a paid GitHub plan, and on GitHub Pro the published
+site is public even though the repo is private.
+
 ## Serving it on your tailnet
 
 On the always-on machine:
