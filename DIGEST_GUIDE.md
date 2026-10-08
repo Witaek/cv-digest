@@ -6,7 +6,7 @@ digest covers; the scheduled task reads it fresh on every run.
 ## Reader
 
 A computer vision engineer who spends **~30 minutes each morning** keeping up with the state of
-the art. They know the field well: skip basics, explain *what is new and why it matters*, give
+the art. Explain *what is new and why it matters*, give
 numbers (mAP, mIoU, latency, params, FPS, hardware) whenever the source has them.
 
 ## Scope (in priority order)
