@@ -1,6 +1,8 @@
 # CV Digest
 
-A morning reading digest on computer vision, models and GPU/CUDA, written by a scheduled Claude task every weekday at 8:29 AM (Montreal time), with a small web UI to browse it.
+A morning reading digest on computer vision, models and GPU/CUDA, written by a scheduled Claude task every morning so it is ready by 8:00 AM (Montreal time), with a small web UI to browse it.
+
+What the digest covers, where it looks and how it is formatted live in [`DIGEST_GUIDE.md`](DIGEST_GUIDE.md); edit that file to change the digest, no need to touch the scheduled task.
 
 ## Layout
 
