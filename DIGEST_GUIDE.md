@@ -33,7 +33,30 @@ generation dominate the digest.
 
 ## Where to look
 
-Use WebSearch and WebFetch (the shell cannot reach most websites). Cover at least:
+### Fetching: shell first, WebFetch as fallback
+
+The cloud environment's network allowlist lets the shell reach these sites directly. That is
+faster and more reliable than WebFetch (arXiv in particular rate-limits WebFetch). Start with
+the machine-readable feeds below via `curl -sS -m 30`, then fetch individual pages
+(abstracts, blog posts, release notes) with `curl` too.
+
+- arXiv cs.CV, newest first (titles + full abstracts, Atom XML):
+  `https://export.arxiv.org/api/query?search_query=cat:cs.CV&sortBy=submittedDate&sortOrder=descending&max_results=200`
+  (arXiv asks for at most one API request every 3 seconds; one request is enough.)
+- Hugging Face Daily Papers (JSON with abstracts and upvotes):
+  `https://huggingface.co/api/daily_papers?limit=100`
+- Hugging Face trending models: `https://huggingface.co/api/models?sort=trendingScore&limit=50`
+  (keep vision tasks: object-detection, image-segmentation, mask-generation, depth-estimation,
+  image-feature-extraction, zero-shot-object-detection, keypoint-detection).
+- PyTorch blog RSS: `https://pytorch.org/feed/`
+- NVIDIA Technical Blog RSS: `https://developer.nvidia.com/blog/feed/`
+
+If `curl` fails with a proxy rejection (the domain is not on the allowlist), fall back to
+WebSearch and WebFetch for that source. Do not retry a page WebFetch has refused. If a whole
+source is unreachable, say so in one line at the top of the digest, but still write full
+summaries for every item whose abstract or page you could read.
+
+### Sources to cover
 
 - Hugging Face Daily Papers and trending papers (huggingface.co/papers)
 - arXiv cs.CV recent submissions (arxiv.org/list/cs.CV/recent)
