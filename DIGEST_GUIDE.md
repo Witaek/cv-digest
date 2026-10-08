@@ -13,16 +13,17 @@ numbers (mAP, mIoU, latency, params, FPS, hardware) whenever the source has them
 
 1. **New models and SOTA methods** for core vision tasks, any architecture (CNN, ViT/transformer,
    hybrid, SSM/Mamba, diffusion-based, foundation models):
+   - realtime oriented, lightweight models
    - object detection (real-time and open-vocabulary: YOLO family, DETR/RT-DETR family, DINO-style,
      grounding models)
    - segmentation: semantic, instance, panoptic, promptable (SAM family), video segmentation
    - vision backbones and self-supervised pretraining (DINO, MAE, SigLIP-like encoders)
    - depth, tracking, pose, 3D/multi-view, video understanding when the method is notable
-2. **Edge and efficient deployment**: quantization, pruning, distillation, NAS, small/mobile models,
+3. **Edge and efficient deployment**: quantization, pruning, distillation, NAS, small/mobile models,
    TensorRT, ONNX Runtime, OpenVINO, ExecuTorch, Core ML, TFLite/LiteRT, Jetson, NPUs.
-3. **GPU / CUDA / PyTorch tooling**: PyTorch releases and blog, torch.compile, Triton, CUDA toolkit
+4. **GPU / CUDA / PyTorch tooling**: PyTorch releases and blog, torch.compile, Triton, CUDA toolkit
    releases, cuDNN, NVIDIA developer blog, FlashAttention-style kernels, data loading/decoding.
-4. **Industry and ecosystem news relevant to CV**: notable open-weight releases, library releases
+5. **Industry and ecosystem news relevant to CV**: notable open-weight releases, library releases
    (Ultralytics, torchvision, timm, Detectron2, MMDetection, Hugging Face transformers vision),
    benchmark/leaderboard changes, conference news (deadlines, best papers), hardware launches.
 
